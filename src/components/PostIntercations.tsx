@@ -54,12 +54,12 @@ const PostInteractions: React.FC = () => {
           hoverColor="group-hover:bg-red-500"
           textColor="group-hover:text-red-500"
         />
-        <InteractionButton
+        {/* <InteractionButton
           iconPath="/svg/original.svg"
           count="10k"
           hoverColor="group-hover:bg-blue-500"
           textColor="group-hover:text-blue-500"
-        />
+        /> */}
       </div>
 
       {/* RIGHT: Save and Share */}

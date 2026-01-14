@@ -3,7 +3,7 @@ import React from "react";
 
 function FeedNav() {
   return (
-    <div className="flex gap-2 justify-between text-textGray font-bold border-b-[1px] border-borderGray sticky top-0 bg-black z-10 px-4 pt-4">
+    <div className="flex w-full gap-2 justify-between text-textGray font-bold border-[1px]  border-borderGray sticky top-0 bg-black z-10 px-4 pt-4">
       <Link
         href="/"
         className="pb-3 flex items-center border-b-4 border-iconBleu text-iconBleu">
