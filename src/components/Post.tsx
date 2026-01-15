@@ -1,9 +1,39 @@
+// "use server";
 import React from "react";
 import CustumImage from "./Image";
 import PostInfo from "./PostInfo";
 import PostIntercations from "./PostIntercations";
 
-function Post() {
+import { imagekit } from "@/util/imageKit";
+
+interface FileDetailsResponse {
+  width: number;
+  height: number;
+  filePath: string;
+  url: string;
+  fileType: string;
+}
+
+async function Post() {
+  const getFileDetails = async (
+    fileId: string
+  ): Promise<FileDetailsResponse> => {
+    return new Promise((resolve, reject) => {
+      // 1. Pass the variable fileId, NOT the string "file_id"
+      imagekit.getFileDetails(fileId, function (error, result) {
+        if (error) {
+          console.log(error);
+          reject(error); // 2. Tell the promise it failed
+        } else if (result) {
+          resolve(result as FileDetailsResponse); // 3. Return the actual data
+        } else {
+          reject(new Error("No file details found"));
+        }
+      });
+    });
+  };
+  const fileDetails = await getFileDetails("696912ee5c7cd75eb840dd21");
+  console.log(fileDetails);
   return (
     <div className="p-4 border-y-[1px] border-borderGray w-full">
       {/* POST TYPE */}
@@ -22,7 +52,7 @@ function Post() {
         <span className="text-[12px]">mohamed bouayaben reposted</span>
       </div>
       {/* OWNER OF THE POST  */}
-      <div className="flex   gap-4">
+      <div className="flex gap-2">
         {/* AVATAR */}
         <div className="relative w-10 h-10 rounded-full overflow-hidden">
           <CustumImage
@@ -38,7 +68,7 @@ function Post() {
         <div className="flex-1 mb-2 ">
           {/* top */}
           <div className="flex justify-between items-center gap-2">
-            <div className="flex items-center gap-2  flex-wrap">
+            <div className="flex items-center gap-1  flex-wrap">
               {/* USER INFO */}
               <h1 className="text-md  cursor-pointer">mohamed bouayaben</h1>
               <span className="text-textGray cursor-pointer text-sm">
@@ -48,8 +78,9 @@ function Post() {
             </div>
             <PostInfo />
           </div>
+          {/* TEXT AND MEDIA */}
           <div className="flex flex-col gap-4 mt-2">
-            <p className="pb-4">
+            <p className="pb-4 sm:text-[10px] md:text-sm lg:text-base">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo
               animi, odit ipsa dignissimos excepturi aliquid? Lorem ipsum dolor
               sit amet consectetur adipisicing elit. Nemo animi, odit ipsa
@@ -57,16 +88,20 @@ function Post() {
               consectetur adipisicing elit. Nemo animi, odit ipsa dignissimos
               excepturi aliquid?
             </p>
-            <CustumImage
-              src="/general/post.jpeg"
-              alt="post"
-              width={600}
-              height={600}
-            />
+            {fileDetails && (
+              <CustumImage
+                src={fileDetails.filePath}
+                width={fileDetails.width}
+                height={fileDetails.height}
+                alt="post"
+                tr={true}
+                className="cursor-pointer"
+              />
+            )}
           </div>
         </div>
       </div>
-      {/* TEXT AND MEDIA */}
+
       {/* USER INTERACTIONS */}
       <PostIntercations />
     </div>

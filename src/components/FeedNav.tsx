@@ -1,23 +1,39 @@
-import Link from "next/link";
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 
 function FeedNav() {
+  // 1. Initialize state with the default active tab
+  const [activeTab, setActiveTab] = useState("For You");
+
+  const tabs = ["For You", "Following", "Next.js", "TailwindCSS"];
+
   return (
-    <div className="flex w-full gap-2 justify-between text-textGray font-bold border-[1px]  border-borderGray sticky top-0 bg-black z-10 px-4 pt-4">
-      <Link
-        href="/"
-        className="pb-3 flex items-center border-b-4 border-iconBleu text-iconBleu">
-        For You
-      </Link>
-      <Link href="/" className="pb-3 flex items-center  ">
-        following
-      </Link>
-      <Link href="/" className="pb-3 flex items-center  ">
-        next.js
-      </Link>
-      <Link href="/" className="pb-3 flex items-center  ">
-        tailwindcss
-      </Link>
+    <div className="flex w-full justify-around text-textGray font-bold border-b border-borderGray sticky top-0 bg-black z-10 px-4 pt-4">
+      {tabs.map((tab) => {
+        const isActive = activeTab === tab;
+
+        return (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`
+              pb-3 flex items-center transition-colors duration-200
+              ${
+                tab === "Next.js" || tab === "TailwindCSS"
+                  ? "hidden md:flex"
+                  : "flex"
+              }
+              ${
+                isActive
+                  ? "border-b-4 border-iconBleu text-white"
+                  : "border-b-4 border-transparent hover:text-white hover:border-iconBleu"
+              }
+            `}>
+            {tab}
+          </button>
+        );
+      })}
     </div>
   );
 }

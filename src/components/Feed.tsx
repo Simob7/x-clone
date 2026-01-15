@@ -3,7 +3,7 @@ import Post from "./Post";
 
 function Feed() {
   return (
-    <div className="flex flex-col w-full items-center">
+    <div className="">
       <Post />
       <Post />
       <Post />
