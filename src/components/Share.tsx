@@ -4,6 +4,7 @@ import CustumImage from "./Image";
 import { sharePost } from "@/actions";
 import Image from "next/image";
 import ImageEditor from "./ImageEditor";
+import CustomVideo from "./CustomVideo";
 
 function Share() {
   // media state
@@ -67,7 +68,7 @@ function Share() {
         />
         {/* MEDIA PREVIEW */}
         {/* MEDIA PREVIEW */}
-        {previewUrl && (
+        {media?.type.includes("image") && previewUrl && (
           <div className="flex flex-col gap-2">
             {/* CONTAINER: 
         - w-full: takes full width
@@ -124,6 +125,16 @@ function Share() {
             />
           </div>
         )}
+        {media?.type.includes("video") && previewUrl && (
+          <div className=" relative">
+            <CustomVideo previewUrl={previewUrl} />
+            <span
+              onClick={() => setMedia(null)}
+              className="absolute top-4 right-4 bg-iconBleu text-white hover:opacity-70 h-8 w-8 flex items-center justify-center rounded-full cursor-pointer">
+              X
+            </span>
+          </div>
+        )}
         {/* resize the preview image before upload */}
         {isEditorOpen && previewUrl && (
           <ImageEditor
@@ -142,6 +153,7 @@ function Share() {
               onChange={handelMediaChange}
               className="hidden"
               id="file"
+              accept="image/*,video/*"
             />
             <label
               htmlFor="file"
@@ -191,7 +203,7 @@ function Share() {
             </label>
           </div>
           <button
-            className="px-4 py-2 bg-white text-black capitalize rounded-full "
+            className="px-4 py-2 bg-iconBleu text-white capitalize rounded-full hover:opacity-70 "
             type="submit">
             post
           </button>

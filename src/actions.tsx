@@ -24,9 +24,13 @@ export async function sharePost(data: FormData) {
       fileName: file.name || "post.jpg",
       folder: "/posts",
       // Use the 'transformation' object correctly for the Node SDK
-      transformation: {
-        pre: tr,
-      },
+      ...(file.type.includes("image")
+        ? {
+            transformation: {
+              pre: tr,
+            },
+          }
+        : {}),
       // IMPORTANT: Remove extensions if you haven't enabled them in ImageKit Dashboard
       /* extensions: [
         { name: "google-auto-tagging", minConfidence: 80, maxTags: 10 }
@@ -35,7 +39,9 @@ export async function sharePost(data: FormData) {
     });
 
     console.log("Upload Success:", response);
-    return { success: true, res: response };
+    // Serialize and Deserialize to ensure it's a plain object
+    const plainResponse = JSON.parse(JSON.stringify(response));
+    return { success: true, res: plainResponse };
   } catch (error: any) {
     // THIS LOGS THE REAL ERROR FROM IMAGEKIT IN YOUR TERMINAL
     console.error("IMAGEKIT API ERROR:", error);

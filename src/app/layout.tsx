@@ -12,7 +12,7 @@ export default function RootLayout({
       <body>
         {/* the responsive flexbox for the left and right bars */}
         <div className="max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl xxl:max-w-screen-xxl mx-auto flex justify-between">
-          <div className="px-2 xsm:px-4 xxl:px-8">
+          <div className="px-2 xsm:px-2 xxl:px-8">
             <LeftBar />
           </div>
           <div className="lg:min-w-[600px] border-x-[1px] border-borderGray flex-1">

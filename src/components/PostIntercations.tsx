@@ -14,7 +14,7 @@ const InteractionButton: React.FC<InteractionButtonProps> = ({
   textColor = "group-hover:text-IconPink",
 }) => {
   return (
-    <div className="group flex gap-2 items-center cursor-pointer">
+    <div className="group flex gap-1 pb-1 items-center cursor-pointer">
       <div
         className={`w-5 h-5 bg-textGray ${hoverColor} transition-colors`}
         style={{

@@ -5,6 +5,7 @@ import PostInfo from "./PostInfo";
 import PostIntercations from "./PostIntercations";
 
 import { imagekit } from "@/util/imageKit";
+import VideoKit from "./VideoKit";
 
 interface FileDetailsResponse {
   width: number;
@@ -32,12 +33,13 @@ async function Post() {
       });
     });
   };
-  const fileDetails = await getFileDetails("696912ee5c7cd75eb840dd21");
+  const fileDetails = await getFileDetails("696a61b95c7cd75eb8b79e44");
+
   console.log(fileDetails);
   return (
-    <div className="p-4 border-y-[1px] border-borderGray w-full">
+    <div className="p-1 border-y-[1px] border-borderGray w-full">
       {/* POST TYPE */}
-      <div className="flex items-center gap-2 text-sm  text-textGray  mb-2">
+      <div className="flex items-center gap-2 text-sm  text-textGray  mb-1">
         <div
           className={`w-4 h-4 bg-textGray  transition-colors`}
           style={{
@@ -54,7 +56,7 @@ async function Post() {
       {/* OWNER OF THE POST  */}
       <div className="flex gap-2">
         {/* AVATAR */}
-        <div className="relative w-10 h-10 rounded-full overflow-hidden">
+        <div className="relative w-6 h-6 rounded-full overflow-hidden">
           <CustumImage
             src={"/general/avatar.png"}
             width={100}
@@ -65,7 +67,7 @@ async function Post() {
           />
         </div>
         {/* content */}
-        <div className="flex-1 mb-2 ">
+        <div className="flex-1 min-w-0 mb-1 ">
           {/* top */}
           <div className="flex justify-between items-center gap-2">
             <div className="flex items-center gap-1  flex-wrap">
@@ -79,25 +81,40 @@ async function Post() {
             <PostInfo />
           </div>
           {/* TEXT AND MEDIA */}
-          <div className="flex flex-col gap-4 mt-2">
-            <p className="pb-4 sm:text-[10px] md:text-sm lg:text-base">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo
-              animi, odit ipsa dignissimos excepturi aliquid? Lorem ipsum dolor
-              sit amet consectetur adipisicing elit. Nemo animi, odit ipsa
-              dignissimos excepturi aliquid?Lorem ipsum dolor sit amet
-              consectetur adipisicing elit. Nemo animi, odit ipsa dignissimos
-              excepturi aliquid?
+          <div className="flex w-full flex-col  mt-1">
+            <p className="pb-1 text-sm md:text-base">
+              {" "}
+              {/* Adjusted font sizes */}
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestias
+              facere aliquid culpa neque perspiciatis iste repellat impedit quam
+              animi quasi obcaecati suscipit architecto nemo, possimus quos
+              dolorem fuga voluptatibus. Natus, tempore voluptatum quidem quod
+              sequi illum laboriosam, adipisci quaerat laborum aperiam eos
+              exercitationem numquam facere recusandae quibusdam rem. Itaque
+              exercitationem praesentium vero laudantium eius commodi eveniet
+              temporibus odit placeat amet ut aut nemo, dolores sunt voluptatum
+              debitis necessitatibus, cupiditate id, obcaecati odio consequatur
+              minus optio unde! Quasi!
             </p>
-            {fileDetails && (
-              <CustumImage
-                src={fileDetails.filePath}
-                width={fileDetails.width}
-                height={fileDetails.height}
-                alt="post"
-                tr={true}
-                className="cursor-pointer"
-              />
-            )}
+
+            {/* Add a wrapper div here to control the width */}
+            <div className="w-full">
+              {fileDetails && fileDetails.fileType === "image" ? (
+                <CustumImage
+                  src={fileDetails.filePath}
+                  width={fileDetails.width}
+                  height={fileDetails.height}
+                  alt="post"
+                  tr={true}
+                  className="w-full h-auto rounded-xl"
+                />
+              ) : (
+                <VideoKit
+                  videoSrc={fileDetails.filePath}
+                  className="w-full aspect-video rounded-xl"
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>

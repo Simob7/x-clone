@@ -34,3 +34,19 @@ body {
 .animate-scaleIn {
   animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Ensure the container takes up the whole screen area in fullscreen mode */
+
+/* Targets the container when in fullscreen mode */
+div:fullscreen video {
+  max-height: 100vh !important;
+  width: 100vw !important;
+  object-fit: contain;
+}
+
+div:fullscreen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: black;
+}

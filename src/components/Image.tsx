@@ -22,6 +22,7 @@ function CustumImage({ src, width, height, alt, className, tr }: imageProps) {
         {...(tr
           ? { transformation: [{ width: width, height: height }] }
           : { width: width, height: height })}
+        loading="eager"
       />
     </ImageKitProvider>
   );
