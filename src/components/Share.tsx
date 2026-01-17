@@ -80,8 +80,8 @@ function Share() {
                 settings.type === "original"
                   ? "h-auto"
                   : settings.type === "square"
-                  ? "aspect-square"
-                  : "aspect-video"
+                    ? "aspect-square"
+                    : "aspect-video"
               }`}>
               <Image
                 src={previewUrl}
@@ -91,8 +91,8 @@ function Share() {
                   settings.type === "square"
                     ? 600
                     : settings.type === "wide"
-                    ? 337
-                    : 600
+                      ? 337
+                      : 600
                 }
                 alt="media preview"
                 className={`transition-all duration-300 ease-in-out w-full h-full ${

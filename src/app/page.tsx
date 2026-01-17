@@ -8,6 +8,7 @@ import Share from "@/components/Share";
 const Homepage = () => {
   return (
     <div className="">
+      <FeedNav />
       <Share />
       <Feed />
     </div>

@@ -115,7 +115,7 @@ function page() {
           </span>
         </div>
       </div>
-      
+      <FeedNav />
       <Feed />
     </div>
   );

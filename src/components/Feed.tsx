@@ -5,7 +5,6 @@ import FeedNav from "./FeedNav";
 function Feed() {
   return (
     <div className="">
-      <FeedNav />
       <Post />
       <Post />
       <Post />

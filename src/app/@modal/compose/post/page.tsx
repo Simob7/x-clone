@@ -2,18 +2,27 @@
 import CustumImage from "@/components/Image";
 import Share from "@/components/Share";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect } from "react";
 
 function PostModal() {
+  useEffect(() => {
+    // Disable scrolling on the body when modal is open
+    document.body.style.overflow = "hidden";
+
+    // Re-enable scrolling when modal is closed
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
   const router = useRouter();
 
   const closeModal = () => {
     router.back();
   };
   return (
-    <div className="absolute w-screen h-screen top-0 left-0 z-20 bg-[#293139a6] flex justify-center ">
-      <div className="py-4 px-8 rounded-xl bg-black w-[600px] h-max mt-12  flex flex-col gap-4">
-        TOP
+    <div className="absolute w-screen h-screen top-0 left-0 z-20 bg-[#293139a6] flex justify-center  ">
+      <div className="py-4 px-8 rounded-xl bg-black max-w-fit h-max mt-12  flex flex-col gap-4">
+        {/* TOP */}
         <div className="flex items-center justify-between">
           <div onClick={closeModal} className="cursor-pointer ">
             X
