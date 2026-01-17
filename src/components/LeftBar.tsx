@@ -95,7 +95,7 @@ function LeftBar() {
         </div>
         {/* BUTTON  */}
         <Link
-          href={"/"}
+          href={"/compose/post"}
           className=" bg-white text-black rounded-full font-bold w-12 h-12 flex items-center justify-center xl:hidden">
           <CustumImage
             src="icons/post.svg"
@@ -105,7 +105,7 @@ function LeftBar() {
           />
         </Link>
         <Link
-          href={"/"}
+          href={"/compose/post"}
           className="hidden xl:block bg-white text-black rounded-full font-bold py-2 px-20 ">
           post
         </Link>

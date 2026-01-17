@@ -17,7 +17,7 @@ interface FileDetailsResponse {
 
 async function Post() {
   const getFileDetails = async (
-    fileId: string
+    fileId: string,
   ): Promise<FileDetailsResponse> => {
     return new Promise((resolve, reject) => {
       // 1. Pass the variable fileId, NOT the string "file_id"
@@ -35,7 +35,7 @@ async function Post() {
   };
   const fileDetails = await getFileDetails("696a61b95c7cd75eb8b79e44");
 
-  console.log(fileDetails);
+  // console.log(fileDetails);
   return (
     <div className="p-1 border-y-[1px] border-borderGray w-full">
       {/* POST TYPE */}
