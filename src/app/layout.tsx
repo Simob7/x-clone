@@ -18,7 +18,7 @@ export default function RootLayout({
           <div className="lg:min-w-[600px] border-x-[1px] border-borderGray flex-1">
             {children}
           </div>
-          <div className="px-2 hidden lg:flex ml-5 md:ml-8 flex-1">
+          <div className="px-2 hidden lg:flex ml-5 md:ml-8 flex-1 ">
             <RightBar />
           </div>
         </div>
