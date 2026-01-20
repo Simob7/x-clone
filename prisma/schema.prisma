@@ -1,0 +1,136 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// The "Ownership" vs "Interaction" Distinction
+// Think of it like a book in a library:
+
+// The Author (userId): Only one person can be the author of a specific post. This is a 1-to-Many relationship. (One user has many posts).
+
+// The Liker (Like Table): Many people can like that same post. This is a Many-to-Many relationship managed by your "Join Table."
+
+// Why this is actually perfect:
+// Identity: If you delete the Author, the post disappears (onDelete: Cascade).
+
+// Activity: If a Liker deletes their account, the Post stays (because they aren't the author), but their specific Like record is removed from the list.
+
+// Data separation: Post.userId tells you whose post it is. The Like table tells you who liked it. They are two different questions!
+
+// Saved Posts (Bookmarks) is exactly like adding the Like table. It is a Many-to-Many relationship because one user can save many posts, and one post can be saved by many users.
+
+// In the database world, we call this another "Join Table."
+// *******************************
+
+
+// USER TABLE 
+model User {
+  id    String     @id
+  email String  @unique
+  username String @unique
+  displayName  String? 
+  bio String?
+  location String?
+  job String?
+  website String?
+  UserImg String?
+  userCover String?
+  
+  // RELATIONS
+  posts Post[]
+  likes Like[] // The user's collection of likes
+  savedPosts SavedPosts[] // The user's bookmarks
+  // People WHO FOLLOW this user
+  followers   Follow[] @relation("UserFollowers")
+  
+  // People THIS USER follows
+  following   Follow[] @relation("UserFollowing")
+}
+// *********************************
+// POST TABLE
+model Post {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  desc         String?  @db.VarChar(280) // X uses 280 characters!
+  img          String?  
+  video        String?  // Made optional so text-only posts work
+  isSensitive  Boolean  @default(false) // For that "Adult Content" warning
+
+  // Who wrote it?
+  author       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+
+  // REPOST LOGIC: "I'm sharing his post"
+  rePostId     Int? 
+  rePost       Post?    @relation("Reposts", fields: [rePostId], references: [id], onDelete: SetNull)
+  rePosts      Post[]   @relation("Reposts")
+  likes Like[] // The list of people who liked this post
+  savedPosts SavedPosts[] // List of who bookmarked this
+
+  // COMMENT LOGIC: "I'm talking under his post"
+  parentPostId Int?
+  parentPost   Post?    @relation("PostComments", fields: [parentPostId], references: [id], onDelete: Cascade)
+  comments     Post[]   @relation("PostComments")
+}
+
+// LIKE TABLE (The Join Table)
+model Like {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  // The User who liked
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+
+  // The Post that was liked
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
+
+  // This ensures a user can't like the same post twice!
+  @@unique([userId, postId])
+}
+
+// SAVED POST TABLE
+model SavedPosts {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  // The User who saved it
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+
+  // The Post that was saved
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
+
+  // A user can't save the same post twice!
+  @@unique([userId, postId])
+
+  
+}
+// the "Follower System"—this is the final boss of social media databases! It’s famous because it is a Self-Referencing Many-to-Many relationship.
+
+// In simple terms: A User follows a User. It’s the same table talking to itself.
+
+model Follow {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+
+  // The person who is clicking "Follow"
+  follower    User     @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  followerId  String
+
+  // The person being followed
+  following   User     @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+  followingId String
+
+  // Prevent following the same person twice!
+  @@unique([followerId, followingId])
+}
