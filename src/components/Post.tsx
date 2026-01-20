@@ -7,6 +7,8 @@ import PostIntercations from "./PostIntercations";
 import { imagekit } from "@/util/imageKit";
 import VideoKit from "./VideoKit";
 
+import { prisma } from "../prisma";
+
 interface FileDetailsResponse {
   width: number;
   height: number;
@@ -34,8 +36,10 @@ async function Post() {
     });
   };
   const fileDetails = await getFileDetails("696a61b95c7cd75eb8b79e44");
+  // Run inside `async` function
+  const allUsers = await prisma.user.findMany();
 
-  // console.log(fileDetails);
+  console.log(allUsers);
   return (
     <div className="p-1 border-y-[1px] border-borderGray w-full">
       {/* POST TYPE */}
