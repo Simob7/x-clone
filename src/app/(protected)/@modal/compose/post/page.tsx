@@ -1,6 +1,5 @@
 "use client";
 import CustumImage from "@/components/Image";
-import Share from "@/components/Share";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 

@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 
 export default function CustomVideo({ previewUrl }: { previewUrl: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);

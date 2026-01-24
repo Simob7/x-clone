@@ -26,7 +26,7 @@ function Share() {
     }
   };
   // preview url
-  let previewUrl = media ? URL.createObjectURL(media) : null;
+  const previewUrl = media ? URL.createObjectURL(media) : null;
   return (
     <form
       className="p-4 flex gap-4"
