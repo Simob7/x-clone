@@ -50,3 +50,12 @@ div:fullscreen {
   justify-content: center;
   background-color: black;
 }
+
+/* This targets the Clerk footer/watermark */
+.cl-internal-1dauvpw {
+  display: none !important;
+}
+
+/* Note: Clerk frequently updates their class names, 
+   so you may need to use the browser inspector to find 
+   the exact class of that footer element. */

@@ -42,10 +42,12 @@ export async function sharePost(data: FormData) {
     // Serialize and Deserialize to ensure it's a plain object
     const plainResponse = JSON.parse(JSON.stringify(response));
     return { success: true, res: plainResponse };
-  } catch (error: any) {
+  } catch (error) {
     // THIS LOGS THE REAL ERROR FROM IMAGEKIT IN YOUR TERMINAL
     console.error("IMAGEKIT API ERROR:", error);
-    throw new Error(error.message || "Failed to share post");
+    throw new Error(
+      error instanceof Error ? error.message : "Failed to share post",
+    );
   }
 }
 
