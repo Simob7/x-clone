@@ -1,7 +1,12 @@
 "use client";
 import React, { useRef, useState } from "react";
 
-export default function CustomVideo({ previewUrl }: { previewUrl: string }) {
+export default function CustomVideo({
+  videoSrc,
+}: {
+  videoSrc: string;
+  // className?: string;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -81,7 +86,7 @@ export default function CustomVideo({ previewUrl }: { previewUrl: string }) {
                  fullscreen:rounded-none fullscreen:w-screen fullscreen:h-screen">
       <video
         ref={videoRef}
-        src={previewUrl}
+        src={videoSrc}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         onClick={handlePlayPause}

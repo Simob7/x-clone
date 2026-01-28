@@ -9,7 +9,7 @@ function FeedNav() {
   const tabs = ["For You", "Following", "Next.js", "TailwindCSS"];
 
   return (
-    <div className="flex w-full justify-around text-textGray font-bold border-b border-borderGray sticky top-0 bg-black z-10 px-4 pt-4">
+    <div className="flex w-full justify-around text-textGray font-bold border-b border-borderGray sticky top-0 bg-black z-10 px-4 pt-1">
       {tabs.map((tab) => {
         const isActive = activeTab === tab;
 

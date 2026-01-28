@@ -1,33 +1,46 @@
-import React from "react";
-import Post from "./Post";
+// src/app/api/posts/route.ts
 import { prisma } from "@/prisma";
 import { auth } from "@clerk/nextjs/server";
-import InfiniteFeed from "./InfiniteFeed";
+import { NextRequest } from "next/server";
 
-async function Feed({ userProfileId }: { userProfileId: string }) {
-  // fetch posts from the current user and the following from mysql prisma ORM database
-  const userId = (await auth()).userId;
-  if (!userId) return null;
+export async function GET(request: NextRequest) {
+  const { userId } = await auth();
 
-  const whereCondition = userProfileId
-    ? { userId: userProfileId }
-    : {
-        parentPostId: null,
-        userId: {
-          in: [
-            userId,
-            ...(
-              await prisma.follow.findMany({
-                where: { followerId: userId },
-                select: { followingId: true },
-              })
-            ).map((follow) => follow.followingId),
-          ],
-        },
-      };
+  if (!userId) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
+  }
+
+  const url = new URL(request.url);
+  const userProfileId = url.searchParams.get("userProfileId");
+  const page = url.searchParams.get("cursor") || 0;
+  const limt = 3;
+
+  const whereCondition =
+    userProfileId !== null
+      ? { userId: userProfileId }
+      : {
+          parentPostId: null,
+          userId: {
+            in: [
+              userId,
+              ...(
+                await prisma.follow.findMany({
+                  where: { followerId: userId },
+                  select: { followingId: true },
+                })
+              ).map((follow) => follow.followingId),
+            ],
+          },
+        };
+
   const posts = await prisma.post.findMany({
     where: whereCondition,
+    take: limt,
+    skip: (Number(page) - 1) * limt,
     include: {
+      // 1. Get the actual likes (to check if current user liked it)
       author: { select: { displayName: true, username: true, UserImg: true } },
       // get the repost
       rePost: {
@@ -37,7 +50,6 @@ async function Feed({ userProfileId }: { userProfileId: string }) {
           },
         },
       },
-      // 1. Get the actual likes (to check if current user liked it)
       likes: {
         where: { userId: userId },
         select: { userId: true },
@@ -60,8 +72,6 @@ async function Feed({ userProfileId }: { userProfileId: string }) {
         select: { userId: true },
       },
     },
-    take: 3,
-    skip: 0,
     orderBy: { createdAt: "desc" },
   });
   const formattedPosts = posts.map((post) => ({
@@ -83,28 +93,15 @@ async function Feed({ userProfileId }: { userProfileId: string }) {
       : null,
     hasLiked: post.likes.length > 0,
     hasSaved: post.savedPosts.length > 0,
-    likeCounts: post._count.likes,
     hasReposted: post.rePosts.length > 0,
+    likeCounts: post._count.likes,
     commentCounts: post._count.comments,
     rePostCounts: post._count.rePosts,
   }));
-  console.log("formattedPosts:", formattedPosts);
-  return (
-    <div className="flex flex-col ">
-      {formattedPosts.length > 0 ? (
-        formattedPosts.map((post) => (
-          <div key={post.id}>
-            <Post post={post} />
-          </div>
-        ))
-      ) : (
-        <p className="text-gray-500 text-center">
-          Nothing to see here... go follow someone!
-        </p>
-      )}
-      <InfiniteFeed userProfileId={userProfileId} />
-    </div>
-  );
-}
+  const totalPosts = await prisma.post.count({ where: whereCondition });
+  const hasMore = Number(page) * limt < totalPosts;
 
-export default Feed;
+  // await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
+
+  return Response.json({ posts: formattedPosts, hasMore });
+}

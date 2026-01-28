@@ -1,122 +1,154 @@
 import Feed from "@/components/Feed";
 import FeedNav from "@/components/FeedNav";
+import FollowButton from "@/components/FollowButton";
 import CustumImage from "@/components/Image";
+import { prisma } from "@/prisma";
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import React from "react";
+type Props = {
+  params: Promise<{ username: string }>;
+};
+async function page({ params }: Props) {
+  const userId = await auth().then((res) => res.userId);
+  if (!userId) notFound();
 
-function page() {
+  const { username } = await params;
+  const user = await prisma.user.findUnique({
+    where: { username: username },
+    include: {
+      _count: { select: { followers: true, following: true, posts: true } },
+      // WE WANT: Does this profile have a follower where followerId is ME?
+      followers: userId ? { where: { followerId: userId } } : undefined,
+    },
+  });
+
+  if (!user) return notFound();
+  // CHECK IDENTITY: Is this MY profile or someone else's?
+  const isSelf = userId === user.id;
+  const isFollowing = user.followers && user.followers.length > 0;
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col  w-full max-w-2xl mx-auto">
       {/* PROFILE TITLE */}
       <div className="flex items-center gap-8 sticky top-0 backdrop-blur-md p-4 z-10 bg-[#00000084]">
         <Link href={"/"}>
           <CustumImage src="icons/back.svg" width={24} height={24} alt="back" />
         </Link>
-        <h1 className="font-bold text-lg">bouayaben9</h1>
-      </div>
-      {/* INFO */}
-      <div>
-        {/* COVER AND AVATAR */}
-        <div className="relative w-full">
-          {/* COVER */}
-          <div className="w-full aspect-[3/1] relative">
-            <CustumImage src="general/cover.jpg " width={800} height={200} />
-          </div>
-          {/* PROFILE PICTURE */}
-          <div className="w-1/6 aspect-square  rounded-full overflow-hidden border-[4px] border-black bg-gray-400 absolute left-4 -translate-y-1/2">
-            <CustumImage
-              src="general/avatar.png "
-              width={100}
-              height={100}
-              tr={true}
-              className=" absolute top-0"
-            />
-          </div>
-        </div>
-        {/* ICONS && BUTTON */}
-        <div className=" flex items-center justify-end m-2 gap-2">
-          <div className="w-9 h-9 flex items-center justify-center rounded-full border-[1px] border-gray-500 cursor-pointer">
-            <CustumImage
-              src="icons/more.svg"
-              alt="more"
-              width={20}
-              height={20}
-            />
-          </div>
-          <div className="w-9 h-9 flex items-center justify-center rounded-full border-[1px] border-gray-500 cursor-pointer">
-            <CustumImage
-              src="icons/explore.svg"
-              alt="more"
-              width={20}
-              height={20}
-            />
-          </div>
-          <div className="w-9 h-9 flex items-center justify-center rounded-full border-[1px] border-gray-500 cursor-pointer">
-            <CustumImage
-              src="icons/message.svg"
-              alt="more"
-              width={20}
-              height={20}
-            />
-          </div>
-          <button className="max-w-fit bg-white py-2 px-4 text-black font-bold rounded-full">
-            Follow
-          </button>
-        </div>
-        {/* INFOS */}
-        <div className="flex flex-col gap-2">
-          <div className="p-2 flex items-start flex-col">
-            {/* FULL NAME */}
-            <h1 className="text-lg font-bold capitalize">mohamed bouayaben</h1>
-            {/* USERNAME */}
-            <span className="text-sm text-textGray">@bouayaben9</span>
-          </div>
-          {/* BIO */}
-          <div className="pl-2 ">
-            <p className="text-sm">
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Eius
-              quisquam deleniti quis dignissimos, fugit ipsam aliquid ratione!
-            </p>
-          </div>
-          {/* FEATURES */}
-          <div className="flex gap-2 items-center flex-wrap  mt-2 p-2">
-            <div className="flex justify-center items-center text-textGray gap-1">
-              <CustumImage src="icons/job.svg" width={20} height={20} />
-              <span className="capitalize">community</span>
-            </div>
-
-            <div className="flex justify-center items-center text-textGray gap-1">
-              <CustumImage
-                src="icons/userLocation.svg"
-                width={20}
-                height={20}
-              />
-              <span className="capitalize">morocco</span>
-            </div>
-
-            <div className="flex justify-center items-center text-textGray gap-1">
-              <CustumImage src="icons/date.svg" width={20} height={20} />
-              <span className="capitalize">Joined August 2015</span>
-            </div>
-          </div>
-          {/* following and followers */}
-          <div className="p-2 flex gap-4 ">
-            <div className="flex items-center justify-center gap-1">
-              <span className="font-bold ">61</span>
-              <span className="text-textGray ">Following</span>
-            </div>
-            <div className="flex items-center justify-center gap-1">
-              <span className="font-bold">331.6K</span>
-              <span className="text-textGray ">Followers</span>
-            </div>
-          </div>
-          <span className="text-textGray px-2 capitalize text-sm">
-            Not followed by anyone you’re following
+        <div className="flex flex-col">
+          <h1 className="font-bold text-lg">
+            {user?.displayName || user?.username}
+          </h1>
+          {/* OPTIONAL: Show post count if you add it to prisma query */}
+          <span className="text-xs text-textGray">
+            {user._count.posts} posts
           </span>
         </div>
       </div>
+
+      {/* INFO */}
+      <div>
+        <div className="relative w-full">
+          {/* COVER: Smart fallback for null cover */}
+          <div className="w-full aspect-[3/1] relative bg-gray-800">
+            <CustumImage
+              src={user.userCover || "general/cover.jpg"}
+              width={400}
+              height={100}
+              className="object-cover w-full h-full"
+            />
+          </div>
+          {/* PROFILE PICTURE: Smart fallback for null image */}
+          <div className="w-24 h-24 rounded-full overflow-hidden border-[4px] border-black bg-gray-400 absolute left-4 -translate-y-1/2">
+            <CustumImage
+              src={user.UserImg || "general/noAvatar.png"}
+              width={100}
+              height={100}
+              tr={true}
+              className="object-cover w-full h-full"
+            />
+          </div>
+        </div>
+
+        {/* ACTIONS */}
+        <div className="flex items-center justify-end m-2 gap-2 h-12">
+          {/* Only show interaction icons if it's NOT your own profile */}
+          {!isSelf && (
+            <>
+              <div className="icon-button">
+                <CustumImage src="icons/more.svg" width={20} height={20} />
+              </div>
+              <div className="icon-button">
+                <CustumImage src="icons/message.svg" width={20} height={20} />
+              </div>
+            </>
+          )}
+
+          {/* SMART BUTTON: Edit Profile vs Follow/Unfollow */}
+          <FollowButton
+            // userId={user.id}
+            isFollowed={isFollowing}
+            isSelf={isSelf}
+          />
+        </div>
+
+        {/* PROFILE DETAILS */}
+        <div className="flex flex-col gap-2 p-2">
+          <div>
+            <h1 className="text-lg font-bold capitalize">
+              {user.displayName || user.username}
+            </h1>
+            <span className="text-sm text-textGray">@{user.username}</span>
+          </div>
+
+          {/* BIO: Handling empty state */}
+          <p className="text-sm">{user.bio || "No bio yet."}</p>
+
+          <div className="flex gap-4 items-center flex-wrap mt-2 text-textGray text-sm">
+            {user.location && (
+              <div className="flex items-center gap-1">
+                <CustumImage
+                  src="icons/userLocation.svg"
+                  width={18}
+                  height={18}
+                />
+                <span>{user.location}</span>
+              </div>
+            )}
+            {user.job && (
+              <div className="flex items-center gap-1">
+                <CustumImage src="icons/job.svg" width={18} height={18} />
+                <span>{user.job}</span>
+              </div>
+            )}
+            <div className="flex items-center gap-1">
+              <CustumImage src="icons/date.svg" width={18} height={18} />
+              <span>
+                Joined{" "}
+                {new Date(user.createdAt).toLocaleDateString("en-US", {
+                  month: "long",
+                  year: "numeric",
+                })}
+              </span>
+            </div>
+          </div>
+
+          {/* FOLLOW COUNTS: Using real DB numbers */}
+          <div className="flex gap-4 text-sm mt-2">
+            <div className="flex items-center gap-1 cursor-pointer hover:underline">
+              <span className="font-bold">{user._count.following}</span>
+              <span className="text-textGray">Following</span>
+            </div>
+            <div className="flex items-center gap-1 cursor-pointer hover:underline">
+              <span className="font-bold">{user._count.followers}</span>
+              <span className="text-textGray">Followers</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <FeedNav />
-      <Feed />
+      <Feed userProfileId={user.id} />
     </div>
   );
 }

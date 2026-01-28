@@ -41,6 +41,8 @@ model User {
   website String?
   UserImg String?
   userCover String?
+  createdAt DateTime @default(now()) 
+  updatedAt DateTime @updatedAt    
   
   // RELATIONS
   posts Post[]
@@ -78,6 +80,11 @@ model Post {
   parentPostId Int?
   parentPost   Post?    @relation("PostComments", fields: [parentPostId], references: [id], onDelete: Cascade)
   comments     Post[]   @relation("PostComments")
+
+  // --- ADDED INDEXES ---
+  @@index([userId])       // Fast lookup for "Show me all posts by User X"
+  @@index([rePostId])     // Fast lookup for "How many reposts does this have?"
+  @@index([parentPostId]) // Fast lookup for "Show me all comments for Post Y"
 }
 
 // LIKE TABLE (The Join Table)
@@ -94,8 +101,10 @@ model Like {
   postId    Int
 
   // This ensures a user can't like the same post twice!
-  @@unique([userId, postId])
+  @@unique([userId, postId]) 
+  @@index([postId])          // ADDED: Fast lookup for "Who liked this post?"
 }
+
 
 // SAVED POST TABLE
 model SavedPosts {
@@ -112,7 +121,7 @@ model SavedPosts {
 
   // A user can't save the same post twice!
   @@unique([userId, postId])
-
+  @@index([postId])  // ADDED: Fast lookup for "Who saved this post?"
   
 }
 // the "Follower System"—this is the final boss of social media databases! It’s famous because it is a Self-Referencing Many-to-Many relationship.
@@ -133,4 +142,5 @@ model Follow {
 
   // Prevent following the same person twice!
   @@unique([followerId, followingId])
+  @@index([followingId])  // ADDED: Fast lookup for "Who are the followers of User X?"
 }

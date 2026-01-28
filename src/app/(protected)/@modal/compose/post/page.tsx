@@ -5,96 +5,80 @@ import React, { useEffect } from "react";
 
 function PostModal() {
   useEffect(() => {
-    // Disable scrolling on the body when modal is open
+    // Prevent scrolling and account for scrollbar width to stop the "jump"
+    const originalStyle = window.getComputedStyle(document.body).overflow;
     document.body.style.overflow = "hidden";
 
-    // Re-enable scrolling when modal is closed
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = originalStyle;
     };
   }, []);
+
   const router = useRouter();
 
   const closeModal = () => {
     router.back();
   };
+
   return (
-    <div className="absolute w-screen h-screen top-0 left-0 z-20 bg-[#293139a6] flex justify-center  ">
-      <div className="py-4 px-8 rounded-xl bg-black max-w-fit h-max mt-12  flex flex-col gap-4">
+    // 1. Changed to fixed and inset-0 for full coverage
+    // 2. Added backdrop-blur for a premium feel
+    <div className="fixed inset-0 z-50 bg-[#293139a6] backdrop-blur-sm flex justify-center items-start overflow-y-auto pt-20">
+      
+      {/* Clicking the backdrop closes the modal */}
+      <div className="absolute inset-0 -z-10" onClick={closeModal} />
+
+      <div className="py-4 px-6 rounded-2xl bg-black w-full max-w-[600px] h-max mx-4 flex flex-col gap-4 shadow-2xl border border-borderGray">
+        
         {/* TOP */}
         <div className="flex items-center justify-between">
-          <div onClick={closeModal} className="cursor-pointer ">
-            X
-          </div>
-          <div className=" text-iconBleu font-bold">Draft</div>
+          <button 
+            onClick={closeModal} 
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-900 transition-colors text-white font-bold"
+          >
+            ✕
+          </button>
+          <div className="text-iconBleu font-bold cursor-pointer hover:underline">Draft</div>
         </div>
+
         {/* CENTER */}
-        <div className="py-8 flex items-center gap-4">
-          <div className="relative w-10 h-10 rounded-full overflow-hidden">
+        <div className="py-4 flex items-start gap-4">
+          <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
             <CustumImage
               src="general/avatar.png"
-              width={100}
-              height={100}
+              width={40}
+              height={40}
               alt="profil avatar"
               tr={true}
             />
           </div>
-          <input
-            className="flex-1 bg-transparent outline-none text-lg"
-            type="text"
-            placeholder="what is happening"
+          <textarea
+            className="flex-1 bg-transparent outline-none text-xl text-white placeholder-gray-500 resize-none min-h-[120px] pt-1"
+            placeholder="What is happening?!"
+            autoFocus
           />
         </div>
+
         {/* BOTTOM */}
-        <div className="flex items-center justify-between gap-2 flex-wrap border-t border-borderGray pt-4">
-          <div className="flex items-center gap-2">
-            <CustumImage
-              src={"/icons/image.svg"}
-              alt={"icon"}
-              width={20}
-              height={20}
-              className="cursor-pointer"
-            />
-            <CustumImage
-              src={"icons/gif.svg"}
-              alt={"icon"}
-              width={20}
-              height={20}
-              className="cursor-pointer"
-            />
-            <CustumImage
-              src={"icons/poll.svg"}
-              alt={"icon"}
-              width={20}
-              height={20}
-              className="cursor-pointer"
-            />
-            <CustumImage
-              src={"icons/emoji.svg"}
-              alt={"icon"}
-              width={20}
-              height={20}
-              className="cursor-pointer"
-            />
-            <CustumImage
-              src={"icons/schedule.svg"}
-              alt={"icon"}
-              width={20}
-              height={20}
-              className="cursor-pointer"
-            />
-            <CustumImage
-              src={"/icons/location.svg"}
-              alt={"icon"}
-              width={20}
-              height={20}
-              className="cursor-pointer"
-            />
+        <div className="flex items-center justify-between gap-2 border-t border-borderGray pt-4">
+          <div className="flex items-center gap-1">
+            {["image", "gif", "poll", "emoji", "schedule", "location"].map((icon) => (
+              <div key={icon} className="p-2 rounded-full hover:bg-iconBleu/10 transition-colors cursor-pointer group">
+                <CustumImage
+                  src={`/icons/${icon}.svg`}
+                  alt={icon}
+                  width={20}
+                  height={20}
+                  className="group-hover:brightness-110"
+                />
+              </div>
+            ))}
           </div>
           <button
-            className="px-4 py-2 bg-iconBleu text-white capitalize rounded-full hover:opacity-70 "
-            type="submit">
-            post
+            className="px-6 py-2 bg-iconBleu text-white font-bold rounded-full hover:opacity-90 disabled:opacity-50 transition-opacity"
+            type="submit"
+          >
+            Post
           </button>
         </div>
       </div>
