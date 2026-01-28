@@ -1,6 +1,7 @@
 import "./globals.css";
 import React from "react";
 import { ClerkProvider } from "@clerk/nextjs";
+import QueryProvider from "@/providers/QueryProvider";
 
 export default function RootLayout({
   children,
@@ -9,9 +10,11 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body>{children}</body>
-      </html>
+      <QueryProvider>
+        <html lang="en">
+          <body>{children}</body>
+        </html>
+      </QueryProvider>
     </ClerkProvider>
   );
 }

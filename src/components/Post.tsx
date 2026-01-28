@@ -2,129 +2,139 @@
 import React from "react";
 import CustumImage from "./Image";
 import PostInfo from "./PostInfo";
-import PostIntercations from "./PostIntercations";
 
-import { imagekit } from "@/util/imageKit";
-import VideoKit from "./VideoKit";
+// Update the import path to match your actual Prisma client output location
+import { Post as PostType } from "../generated/prisma/client";
+import { format } from "timeago.js";
+import PostInteractions from "./PostIntercations";
+import Link from "next/link";
+import CustomVideo from "./CustomVideo";
 
-import { prisma } from "../prisma";
-
-interface FileDetailsResponse {
-  width: number;
-  height: number;
-  filePath: string;
-  url: string;
-  fileType: string;
-}
-
-async function Post() {
-  const getFileDetails = async (
-    fileId: string,
-  ): Promise<FileDetailsResponse> => {
-    return new Promise((resolve, reject) => {
-      // 1. Pass the variable fileId, NOT the string "file_id"
-      imagekit.getFileDetails(fileId, function (error, result) {
-        if (error) {
-          console.log(error);
-          reject(error); // 2. Tell the promise it failed
-        } else if (result) {
-          resolve(result as FileDetailsResponse); // 3. Return the actual data
-        } else {
-          reject(new Error("No file details found"));
-        }
-      });
-    });
+export type PostWithDetails = PostType & {
+  user: {
+    displayName: string | null;
+    username: string;
+    userImg: string | null;
   };
-  const fileDetails = await getFileDetails("696a61b95c7cd75eb8b79e44");
-  // Run inside `async` function
-  const allUsers = await prisma.user.findMany();
+  // The nested repost has a similar structure
+  rePost?:
+    | (PostType & {
+        user: {
+          displayName: string | null;
+          username: string;
+          userImg: string | null;
+        };
+      })
+    | null;
+  hasLiked: boolean;
+  hasSaved: boolean;
+  hasReposted: boolean;
+  likeCounts: number;
+  commentCounts: number;
+  rePostCounts: number;
+};
 
-  console.log(allUsers);
+function Post({ post }: { post: PostWithDetails }) {
+  // Determine if we should show the original content
+  // If it's a repost, 'mainPost' becomes the original source
+  const mainPost = post.rePost ? post.rePost : post;
   return (
     <div className="p-1 border-y-[1px] border-borderGray w-full">
-      {/* POST TYPE */}
-      <div className="flex items-center gap-2 text-sm  text-textGray  mb-1">
-        <div
-          className={`w-4 h-4 bg-textGray  transition-colors`}
-          style={{
-            maskImage: `url(/svg/repost.svg)`,
-            maskRepeat: "no-repeat",
-            maskSize: "contain",
-            WebkitMaskImage: `url(/svg/repost.svg)`,
-            WebkitMaskRepeat: "no-repeat",
-            WebkitMaskSize: "contain",
-          }}
-        />
-        <span className="text-[12px]">mohamed bouayaben reposted</span>
-      </div>
-      {/* OWNER OF THE POST  */}
+      {/* 1. REPOST HEADER: Link to the person who clicked "Repost" */}
+      {post.rePostId && (
+        <Link
+          href={`/${post.user.username}`}
+          className="flex items-center gap-2 text-sm text-textGray  ml-8 hover:underline">
+          <div
+            className="w-4 h-4 bg-textGray"
+            style={{
+              maskImage: `url(/svg/repost.svg)`,
+              maskRepeat: "no-repeat",
+              maskSize: "contain",
+              WebkitMaskImage: `url(/svg/repost.svg)`,
+            }}
+          />
+          <span className="text-[12px] font-bold">
+            {post.user.displayName} reposted
+          </span>
+        </Link>
+      )}
+
+      {/* 2. MAIN POST LAYOUT */}
       <div className="flex gap-2">
-        {/* AVATAR */}
-        <div className="relative w-6 h-6 rounded-full overflow-hidden">
+        {/* AVATAR: Links to the Original Author (mainPost) */}
+        <Link
+          href={`/${mainPost.user.username}`}
+          className="relative w-10 h-10 rounded-full overflow-hidden shrink-0">
           <CustumImage
-            src={"/general/avatar.png"}
+            src={mainPost.user.userImg || "general/noAvatar.png"}
             width={100}
             height={100}
-            alt="post"
+            alt={`${mainPost.user.username}'s avatar`}
             tr={true}
-            className="cursor-pointer"
+            className="cursor-pointer object-cover"
           />
-        </div>
-        {/* content */}
-        <div className="flex-1 min-w-0 mb-1 ">
-          {/* top */}
+        </Link>
+
+        {/* CONTENT AREA */}
+        <div className="flex-1 min-w-0 mb-1">
+          {/* USER INFO & TIME: Links to the Original Author (mainPost) */}
           <div className="flex justify-between items-center gap-2">
-            <div className="flex items-center gap-1  flex-wrap">
-              {/* USER INFO */}
-              <h1 className="text-md  cursor-pointer">mohamed bouayaben</h1>
+            <Link
+              href={`/${mainPost.user.username}`}
+              className="flex items-center gap-1 flex-wrap">
+              <h1 className="text-md font-bold cursor-pointer hover:underline">
+                {mainPost.user.displayName}
+              </h1>
               <span className="text-textGray cursor-pointer text-sm">
-                @bouayaben9
+                @{mainPost.user.username}
               </span>
-              <span className="text-textGray text-sm">1 day ago</span>
-            </div>
+              <span className="text-textGray text-sm">
+                · {format(mainPost.createdAt)}
+              </span>
+            </Link>
             <PostInfo />
           </div>
-          {/* TEXT AND MEDIA */}
-          <div className="flex w-full flex-col  mt-1">
-            <p className="pb-1 text-sm md:text-base">
-              {" "}
-              {/* Adjusted font sizes */}
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestias
-              facere aliquid culpa neque perspiciatis iste repellat impedit quam
-              animi quasi obcaecati suscipit architecto nemo, possimus quos
-              dolorem fuga voluptatibus. Natus, tempore voluptatum quidem quod
-              sequi illum laboriosam, adipisci quaerat laborum aperiam eos
-              exercitationem numquam facere recusandae quibusdam rem. Itaque
-              exercitationem praesentium vero laudantium eius commodi eveniet
-              temporibus odit placeat amet ut aut nemo, dolores sunt voluptatum
-              debitis necessitatibus, cupiditate id, obcaecati odio consequatur
-              minus optio unde! Quasi!
+
+          {/* TEXT AND MEDIA: Displays original content (mainPost) */}
+          <div className="flex w-full flex-col mt-1">
+            <p className="pb-1 text-sm md:text-base leading-normal">
+              {mainPost.desc}
             </p>
 
-            {/* Add a wrapper div here to control the width */}
             <div className="w-full">
-              {fileDetails && fileDetails.fileType === "image" ? (
+              {mainPost.img ? (
                 <CustumImage
-                  src={fileDetails.filePath}
-                  width={fileDetails.width}
-                  height={fileDetails.height}
-                  alt="post"
+                  src={mainPost.img}
+                  width={600}
+                  height={600}
+                  alt="post image"
                   tr={true}
-                  className="w-full h-auto rounded-xl"
+                  className="w-full h-auto rounded-xl border border-borderGray"
                 />
-              ) : (
-                <VideoKit
-                  videoSrc={fileDetails.filePath}
-                  className="w-full aspect-video rounded-xl"
+              ) : mainPost.video ? (
+                <CustomVideo
+                  videoSrc={mainPost.video}
+                  // className="w-full aspect-video rounded-xl"
                 />
-              )}
+              ) : null}
             </div>
           </div>
         </div>
       </div>
 
-      {/* USER INTERACTIONS */}
-      <PostIntercations />
+      {/* 3. INTERACTIONS */}
+      <PostInteractions
+        // postId={post.id} // Usually you want interactions to count toward the repost record ID
+        isLiked={post.hasLiked}
+        isSaved={post.hasSaved}
+        isReposted={post.hasReposted}
+        count={{
+          likes: post.likeCounts,
+          comments: post.commentCounts,
+          rePosts: post.rePostCounts,
+        }}
+      />
     </div>
   );
 }

@@ -10,7 +10,7 @@ const Homepage = () => {
     <div className="">
       <FeedNav />
       <Share />
-      <Feed />
+      <Feed userProfileId={""} />
     </div>
   );
 };
