@@ -1,23 +1,20 @@
-import type { Metadata } from "next";
-
+// src/app/layout.tsx (or a specific route layout)
 import ResponsiveLayout from "@/components/ResponsiveLayout";
+import LeftBar from "@/components/LeftBar";
+import RightBar from "@/components/RightBar";
 
-export const metadata: Metadata = {
-  title: " X platform - Clone",
-  description: "Next.js x social media application project",
-};
-
-export default function AppLayout({
+export default function RootLayout({
   children,
-  modal,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-  modal: React.ReactNode;
-}>) {
+}) {
   return (
-    <ResponsiveLayout>
-      {children}
-      {modal}
-    </ResponsiveLayout>
+    <html lang="en">
+      <body>
+        <ResponsiveLayout leftBar={<LeftBar />} rightBar={<RightBar />}>
+          {children}
+        </ResponsiveLayout>
+      </body>
+    </html>
   );
 }
