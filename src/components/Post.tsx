@@ -1,4 +1,4 @@
-// "use server";
+"use client";
 import React from "react";
 import CustumImage from "./Image";
 import PostInfo from "./PostInfo";
@@ -9,6 +9,7 @@ import { format } from "timeago.js";
 import PostInteractions from "./PostIntercations";
 import Link from "next/link";
 import CustomVideo from "./CustomVideo";
+import { useRouter } from "next/navigation";
 
 export type PostWithDetails = PostType & {
   user: {
@@ -38,8 +39,24 @@ function Post({ post }: { post: PostWithDetails }) {
   // Determine if we should show the original content
   // If it's a repost, 'mainPost' becomes the original source
   const mainPost = post.rePost ? post.rePost : post;
+  const router = useRouter();
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+
+    // 1. Ignore links and buttons
+    if (target.closest("button") || target.closest("a")) return;
+
+    // 2. Ignore video controls and the video player itself
+    // We check for 'video' tags or any container you use for the player
+    if (target.closest("video") || target.closest(".video-container")) return;
+
+    router.push(`${mainPost.user.username}/status/${post.id}`);
+  };
   return (
-    <div className="p-1 border-y-[1px] border-borderGray w-full">
+    <div
+      onClick={handleCardClick}
+      className="p-1 border-y-[1px] border-borderGray w-full">
       {/* 1. REPOST HEADER: Link to the person who clicked "Repost" */}
       {post.rePostId && (
         <Link
@@ -102,7 +119,10 @@ function Post({ post }: { post: PostWithDetails }) {
               {mainPost.desc}
             </p>
 
-            <div className="w-full">
+            <div
+              className="w-full video-container"
+              // {/* // Stop click from reaching the main div */}
+              onClick={(e) => e.stopPropagation()}>
               {mainPost.img ? (
                 <CustumImage
                   src={mainPost.img}

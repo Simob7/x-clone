@@ -3,7 +3,7 @@ import { Image, ImageKitProvider } from "@imagekit/next";
 import React from "react";
 const urlEndpoint = process.env.NEXT_PUBLIC_URL_ENDPOINT;
 type imageProps = {
-  src: string;
+  src: string | null;
   width?: number;
   height?: number;
   alt?: string;
@@ -14,7 +14,7 @@ function CustumImage({ src, width, height, alt, className, tr }: imageProps) {
   return (
     <ImageKitProvider urlEndpoint={urlEndpoint!}>
       <Image
-        src={src}
+        src={src || ""}
         width={width}
         height={height}
         alt={alt || "image"}

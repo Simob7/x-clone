@@ -13,12 +13,12 @@ function RightBar() {
       <SearchInput />
       {/* SUBSCIBE TO pREMIUM */}
       <Subscribe />
+      {/* WHO TO FOLLOW */}
+      <WhoToFollow />
       {/* TODAY`S NEWS */}
       <TodayNews />
       {/* WHAT`S HAPPENING */}
-      <WhatHappening /> 
-      {/* WHO TO FOLLOW */}
-      <WhoToFollow />
+      <WhatHappening />
       {/* FOOTER  */}
       <Footer />
     </div>
