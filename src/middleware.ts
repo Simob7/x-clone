@@ -2,6 +2,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 // 1. Explicitly list what anyone can see
 const isPublicRoute = createRouteMatcher([
+  "/api/webhooks/clerk(.*)",
   "/sign-in(.*)",
   "/sign-up(.*)",
   // "/explore(.*)", // Optional: if you want a public feed
