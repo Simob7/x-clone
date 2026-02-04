@@ -3,7 +3,7 @@ import FeedNav from "@/components/FeedNav";
 import FollowButton from "@/components/FollowButton";
 import CustumImage from "@/components/Image";
 import { prisma } from "@/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import React from "react";
@@ -25,6 +25,8 @@ async function page({ params }: Props) {
   });
 
   if (!user) return notFound();
+  // clerk user hook to get user data
+  const CurrentUser = await currentUser();
   // CHECK IDENTITY: Is this MY profile or someone else's?
   const isSelf = userId === user.id;
   const isFollowing = user.followers && user.followers.length > 0;

@@ -4,13 +4,13 @@ import CustumImage from "./Image";
 import PostIntercations from "./PostIntercations";
 import { Post as PostType } from "../generated/prisma/client";
 import { format } from "timeago.js";
+import Link from "next/link";
 
-// Export this so other files can use it for type safety
 export type CommentsWithDetails = PostType & {
   author: {
-    displayName: string | null; // Allow null
+    displayName: string | null;
     username: string;
-    UserImg: string | null; // Allow null
+    UserImg: string | null;
   };
   likes: { userId: string }[];
   rePosts: { userId: string }[];
@@ -23,55 +23,62 @@ export type CommentsWithDetails = PostType & {
 
 async function Comments({
   comments,
+  currentUserId,
 }: {
   comments: CommentsWithDetails[];
-  postId: number;
-  username: string;
+  currentUserId?: string | null;
 }) {
   return (
     <div className="flex flex-col">
       {comments.map((comment) => (
         <div
           key={comment.id}
-          className="p-4 border-b border-borderGray w-full hover:bg-white/[0.02]">
-          <div className="flex gap-3">
-            {/* AVATAR */}
-            <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0">
+          className="relative border-b border-borderGray w-full hover:bg-white/[0.02] transition">
+          <Link
+            href={`/${comment.author.username}/status/${comment.id}`}
+            className="absolute inset-0 z-0"
+          />
+          <div className="p-4 flex gap-3 relative z-10 pointer-events-none">
+            <Link
+              href={`/${comment.author.username}`}
+              className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 pointer-events-auto">
               <CustumImage
-                src={comment.author.UserImg}
+                src={comment.author.UserImg || "/general/noAvatar.png"}
                 width={100}
                 height={100}
                 alt="avatar"
                 tr={true}
                 className="object-cover"
               />
-            </div>
-
+            </Link>
             <div className="flex-1 min-w-0">
-              {/* TOP ROW */}
               <div className="flex justify-between items-center gap-2">
-                <div className="flex items-center gap-1 flex-wrap">
-                  <h1 className="font-bold text-md hover:underline cursor-pointer">
-                    {comment.author.displayName}
-                  </h1>
-                  <span className="text-textGray text-sm">
+                <div className="flex items-center gap-1 flex-wrap pointer-events-auto text-sm">
+                  <Link
+                    href={`/${comment.author.username}`}
+                    className="font-bold hover:underline text-white">
+                    {comment.author.displayName || comment.author.username}
+                  </Link>
+                  <span className="text-textGray">
                     @{comment.author.username}
                   </span>
-                  <span className="text-textGray text-sm">
+                  <span className="text-textGray">
                     · {format(comment.createdAt)}
                   </span>
                 </div>
-                <PostInfo />
+                <div className="pointer-events-auto">
+                  <PostInfo
+                    ownerId={comment.author.username}
+                    currentUserId={currentUserId}
+                    postId={comment.id}
+                  />
+                </div>
               </div>
-
-              {/* CONTENT */}
-              <p className="text-sm md:text-base text-white mt-1">
-                {comment.desc}
-              </p>
-
-              {/* INTERACTIONS: Pass props individually, NOT as PostInteractions={...} */}
-              <div className="mt-2 -ml-2">
+              <p className="text-white mt-1">{comment.desc}</p>
+              <div className="mt-2 -ml-2 pointer-events-auto">
                 <PostIntercations
+                  username={comment.author.username}
+                  postId={comment.id}
                   isLiked={comment.hasLiked ?? false}
                   isSaved={comment.hasSaved ?? false}
                   isReposted={comment.hasReposted ?? false}
@@ -89,5 +96,4 @@ async function Comments({
     </div>
   );
 }
-
 export default Comments;

@@ -5,8 +5,10 @@ import React from "react";
 import PostInteractions from "@/components/PostIntercations";
 import CustomVideo from "@/components/CustomVideo";
 import { prisma } from "@/prisma";
-import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import ReplyForm from "@/components/FormReply";
+import PostInfo from "@/components/PostInfo";
 
 async function PostPage({
   params,
@@ -17,17 +19,23 @@ async function PostPage({
   if (!userId) return null;
 
   const { postId, username } = await params;
+  const user = await currentUser();
 
-  // Fetch post with all necessary relations
   const p = await prisma.post.findFirst({
     where: { id: Number(postId) },
     include: {
       author: { select: { displayName: true, username: true, UserImg: true } },
+      rePost: {
+        include: {
+          author: {
+            select: { displayName: true, username: true, UserImg: true },
+          },
+        },
+      },
       likes: { where: { userId }, select: { userId: true } },
       rePosts: { where: { userId }, select: { userId: true }, take: 1 },
       savedPosts: { where: { userId }, select: { userId: true } },
       _count: { select: { likes: true, comments: true, rePosts: true } },
-      // comments with their relations
       comments: {
         include: {
           author: {
@@ -38,20 +46,16 @@ async function PostPage({
           savedPosts: { where: { userId }, select: { userId: true } },
           _count: { select: { likes: true, comments: true, rePosts: true } },
         },
+        orderBy: { createdAt: "desc" },
       },
     },
   });
 
-  // Security & Existence Checks
   if (!p || p.author.username !== username) return notFound();
 
-  // Clean Formatting logic
-  const postDetails = {
-    ...p,
-    hasLiked: p.likes.length > 0,
-    hasSaved: p.savedPosts.length > 0,
-    hasReposted: p.rePosts.length > 0,
-  };
+  const isRepost = !!p.rePost;
+  const source = isRepost ? p.rePost! : p;
+
   const commentsWidthDetails = p.comments.map((comment) => ({
     ...comment,
     hasLiked: comment.likes.length > 0,
@@ -61,7 +65,6 @@ async function PostPage({
 
   return (
     <div className="flex flex-col w-full border-x border-borderGray min-h-screen bg-black text-white">
-      {/* 1. NAVIGATION HEADER */}
       <header className="flex items-center gap-8 sticky top-0 backdrop-blur-md p-4 z-20 bg-black/60 border-b border-borderGray">
         <Link
           href="/"
@@ -71,46 +74,53 @@ async function PostPage({
         <h1 className="font-bold text-xl">Post</h1>
       </header>
 
-      {/* 2. MAIN CONTENT AREA */}
+      {isRepost && (
+        <div className="px-4 py-2 text-textGray text-sm font-bold border-b border-borderGray flex items-center gap-2">
+          <span>{p.author.displayName} reposted</span>
+        </div>
+      )}
+
       <article className="px-4 py-3 flex flex-col gap-4">
-        {/* User Profile Info */}
-        <section className="flex items-center gap-3">
-          <Link
-            href={`/${p?.author?.username}`}
-            className="h-12 w-12 relative rounded-full overflow-hidden shrink-0">
-            <CustumImage
-              src={p?.author?.UserImg || "/general/noAvatar.png"}
-              width={100}
-              height={100}
-              alt="avatar"
-              tr={true}
-              className="object-cover"
-            />
-          </Link>
-          <div className="flex flex-col min-w-0">
+        <section className="flex justify-between items-start">
+          <div className="flex items-center gap-3">
             <Link
-              href={`/${p?.author?.username}`}
-              className="font-bold hover:underline truncate">
-              {p?.author?.displayName || p?.author?.username}
+              href={`/${source.author.username}`}
+              className="h-12 w-12 relative rounded-full overflow-hidden shrink-0">
+              <CustumImage
+                src={source.author.UserImg || "/general/noAvatar.png"}
+                width={100}
+                height={100}
+                alt="avatar"
+                tr={true}
+                className="object-cover"
+              />
             </Link>
-            <span className="text-textGray truncate">
-              @{p?.author?.username}
-            </span>
+            <div className="flex flex-col">
+              <Link
+                href={`/${source.author.username}`}
+                className="font-bold hover:underline">
+                {source.author.displayName || source.author.username}
+              </Link>
+              <span className="text-textGray">@{source.author.username}</span>
+            </div>
           </div>
+          <PostInfo
+            ownerId={p.author.username}
+            currentUserId={user?.username}
+            postId={p.id}
+          />
         </section>
 
-        {/* Post Text Body */}
         <p className="text-[20px] md:text-[23px] leading-relaxed break-words">
-          {p?.desc}
+          {source.desc}
         </p>
 
-        {/* Media Section: Handles Image or Video */}
-        {(p?.img || p?.video) && (
+        {(source.img || source.video) && (
           <div className="w-full">
-            {p?.img ? (
+            {source.img ? (
               <div className="rounded-2xl border border-borderGray overflow-hidden w-full bg-neutral-900">
                 <CustumImage
-                  src={p?.img}
+                  src={source.img}
                   width={1200}
                   height={1200}
                   alt="post content"
@@ -119,83 +129,50 @@ async function PostPage({
               </div>
             ) : (
               <div className="rounded-2xl border border-borderGray overflow-hidden w-full bg-black">
-                <CustomVideo videoSrc={p?.video!} />
+                <CustomVideo videoSrc={source.video!} />
               </div>
             )}
           </div>
         )}
 
-        {/* Timestamp & Metadata */}
-        <footer className="mt-2">
-          <div className="py-4 border-y border-borderGray text-textGray text-sm md:text-base flex flex-wrap gap-2 items-center">
-            <time className="hover:underline cursor-pointer">
-              {p?.createdAt.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </time>
-            <span>•</span>
-            <time className="hover:underline cursor-pointer">
-              {p?.createdAt.toLocaleDateString([], {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </time>
-            <span>•</span>
-          </div>
+        <div className="text-textGray text-sm border-b border-borderGray pb-4">
+          {source.createdAt.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}{" "}
+          ·{" "}
+          {source.createdAt.toLocaleDateString([], {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })}
+        </div>
 
-          {/* Engagement Icons */}
-          <div className="py-2 border-b border-borderGray">
-            <PostInteractions
-              isLiked={postDetails?.hasLiked}
-              isSaved={postDetails?.hasSaved}
-              isReposted={postDetails?.hasReposted}
-              count={{
-                likes: p?._count.likes,
-                comments: p?._count.comments,
-                rePosts: p?._count.rePosts,
-              }}
-            />
-          </div>
+        <footer className="py-1 border-b border-borderGray">
+          <PostInteractions
+            username={p.author.username}
+            postId={p.id}
+            isLiked={p.likes.length > 0}
+            isSaved={p.savedPosts.length > 0}
+            isReposted={p.rePosts.length > 0}
+            count={{
+              likes: p._count.likes,
+              comments: p._count.comments,
+              rePosts: p._count.rePosts,
+            }}
+          />
         </footer>
       </article>
 
-      {/* 3. REPLY INPUT SECTION */}
-      <section className="flex gap-3 p-4 border-b border-borderGray items-start">
-        <div className="h-10 w-10 relative rounded-full overflow-hidden shrink-0">
-          <CustumImage
-            src={"/general/avatar.png"}
-            width={40}
-            height={40}
-            alt="me"
-            tr={true}
-          />
-        </div>
-        <div className="flex-1">
-          <textarea
-            className="bg-transparent text-xl w-full outline-none placeholder:text-textGray resize-none mt-1"
-            placeholder="Post your reply"
-            rows={1}
-          />
-          <div className="flex justify-end mt-2">
-            <button className="px-5 py-2 bg-iconBlue text-white font-bold rounded-full hover:opacity-90 transition">
-              Reply
-            </button>
-          </div>
-        </div>
-      </section>
+      {user && <ReplyForm userImg={user.imageUrl} postId={p.id} />}
 
-      {/* 4. COMMENTS LISTING */}
       <section className="flex flex-col">
         <Comments
-          comments={commentsWidthDetails} // This is the formatted array from your map logic
-          postId={p?.id}
-          username={p?.author?.username}
+          comments={commentsWidthDetails}
+          currentUserId={user?.username}
         />
       </section>
     </div>
   );
 }
-
 export default PostPage;

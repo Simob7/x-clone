@@ -17,10 +17,10 @@ async function main() {
   const users = await Promise.all([
     prisma.user.create({
       data: {
-        id: "user1",
-        email: "alice@example.com",
-        username: "alice",
-        displayName: "Alice Wonder",
+        id: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM",
+        email: "bouayaben7@gmail.com",
+        username: "simo9",
+        displayName: "simo bouayaben",
         bio: "Full-stack developer and coffee enthusiast. Building the future of social media. 🚀",
         location: "San Francisco, CA",
         job: "Senior Software Engineer",
@@ -152,7 +152,7 @@ async function main() {
     }),
     prisma.user.create({
       data: {
-        id: "user10",
+        id: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM0",
         email: "jack@backend.dev",
         username: "jack_backend",
         displayName: "Jack Backend",
@@ -173,44 +173,44 @@ async function main() {
   await prisma.follow.createMany({
     data: [
       // Alice follows almost everyone
-      { followerId: "user1", followingId: "user2" },
-      { followerId: "user1", followingId: "user3" },
-      { followerId: "user1", followingId: "user5" },
-      { followerId: "user1", followingId: "user6" },
-      { followerId: "user1", followingId: "user7" },
-      { followerId: "user1", followingId: "user8" },
+      { followerId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM", followingId: "user2" },
+      { followerId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM", followingId: "user3" },
+      { followerId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM", followingId: "user5" },
+      { followerId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM", followingId: "user6" },
+      { followerId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM", followingId: "user7" },
+      { followerId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM", followingId: "user8" },
 
       // Bob's network
-      { followerId: "user2", followingId: "user1" },
+      { followerId: "user2", followingId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM" },
       { followerId: "user2", followingId: "user3" },
       { followerId: "user2", followingId: "user4" },
-      { followerId: "user2", followingId: "user10" },
+      { followerId: "user2", followingId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM0" },
 
       // Charlie's connections
-      { followerId: "user3", followingId: "user1" },
+      { followerId: "user3", followingId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM" },
       { followerId: "user3", followingId: "user2" },
       { followerId: "user3", followingId: "user9" },
       { followerId: "user3", followingId: "user4" },
 
       // Dave follows tech people
-      { followerId: "user4", followingId: "user1" },
+      { followerId: "user4", followingId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM" },
       { followerId: "user4", followingId: "user2" },
       { followerId: "user4", followingId: "user6" },
-      { followerId: "user4", followingId: "user10" },
+      { followerId: "user4", followingId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM0" },
 
       // Emma's network (popular founder)
-      { followerId: "user5", followingId: "user1" },
+      { followerId: "user5", followingId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM" },
       { followerId: "user5", followingId: "user2" },
       { followerId: "user5", followingId: "user6" },
       { followerId: "user5", followingId: "user8" },
 
       // Frank follows AI/ML crowd
-      { followerId: "user6", followingId: "user1" },
+      { followerId: "user6", followingId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM" },
       { followerId: "user6", followingId: "user5" },
-      { followerId: "user6", followingId: "user10" },
+      { followerId: "user6", followingId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM0" },
 
       // Grace's mobile dev network
-      { followerId: "user7", followingId: "user1" },
+      { followerId: "user7", followingId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM" },
       { followerId: "user7", followingId: "user3" },
       { followerId: "user7", followingId: "user4" },
       { followerId: "user7", followingId: "user9" },
@@ -218,18 +218,21 @@ async function main() {
       // Henry follows security folks
       { followerId: "user8", followingId: "user2" },
       { followerId: "user8", followingId: "user5" },
-      { followerId: "user8", followingId: "user10" },
+      { followerId: "user8", followingId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM0" },
 
       // Iris follows creatives
       { followerId: "user9", followingId: "user3" },
       { followerId: "user9", followingId: "user7" },
-      { followerId: "user9", followingId: "user1" },
+      { followerId: "user9", followingId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM" },
 
       // Jack's backend community
-      { followerId: "user10", followingId: "user1" },
-      { followerId: "user10", followingId: "user2" },
-      { followerId: "user10", followingId: "user4" },
-      { followerId: "user10", followingId: "user6" },
+      {
+        followerId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM0",
+        followingId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM",
+      },
+      { followerId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM0", followingId: "user2" },
+      { followerId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM0", followingId: "user4" },
+      { followerId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM0", followingId: "user6" },
     ],
   });
 
@@ -242,7 +245,7 @@ async function main() {
   posts.push(
     await prisma.post.create({
       data: {
-        userId: "user1",
+        userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM",
         desc: "Just deployed the new Prisma schema! The type safety is incredible. #webdev #prisma",
         img: "https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg",
         createdAt: new Date(Date.now() - 86400000 * 5),
@@ -253,7 +256,7 @@ async function main() {
   posts.push(
     await prisma.post.create({
       data: {
-        userId: "user1",
+        userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM",
         desc: "Coffee + Code = Perfect Morning ☕️💻",
         img: "https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg",
         createdAt: new Date(Date.now() - 86400000 * 2),
@@ -442,7 +445,7 @@ async function main() {
   posts.push(
     await prisma.post.create({
       data: {
-        userId: "user10",
+        userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM0",
         desc: "Built a REST API that handles 10K requests/sec. Node.js + Redis = 🔥",
         createdAt: new Date(Date.now() - 3600000 * 7),
       },
@@ -452,7 +455,7 @@ async function main() {
   posts.push(
     await prisma.post.create({
       data: {
-        userId: "user10",
+        userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM0",
         desc: "Microservices architecture diagram for our new project. Thoughts?",
         img: "https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg",
         createdAt: new Date(Date.now() - 86400000 * 4),
@@ -465,7 +468,7 @@ async function main() {
   // 5. CREATE REPOSTS (Quote and Simple)
   await prisma.post.create({
     data: {
-      userId: "user1",
+      userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM",
       rePostId: posts[2].id,
       desc: null,
       createdAt: new Date(Date.now() - 3600000 * 9),
@@ -506,12 +509,12 @@ async function main() {
         desc: "Agreed. Much better than manual SQL for most things.",
       },
       {
-        userId: "user10",
+        userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM0",
         parentPostId: posts[0].id,
         desc: "How's the performance compared to raw SQL?",
       },
       {
-        userId: "user1",
+        userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM",
         parentPostId: posts[8].id,
         desc: "Congratulations! Well deserved 🎉",
       },
@@ -541,7 +544,7 @@ async function main() {
         desc: "95% is impressive! What dataset are you using?",
       },
       {
-        userId: "user1",
+        userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM",
         parentPostId: posts[10].id,
         desc: "ML is the future! Keep pushing 🚀",
       },
@@ -559,12 +562,12 @@ async function main() {
     { userId: "user3", postId: posts[0].id },
     { userId: "user4", postId: posts[0].id },
     { userId: "user6", postId: posts[0].id },
-    { userId: "user10", postId: posts[0].id },
+    { userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM0", postId: posts[0].id },
   );
 
   // Post 2 - popular
   likeData.push(
-    { userId: "user1", postId: posts[2].id },
+    { userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM", postId: posts[2].id },
     { userId: "user3", postId: posts[2].id },
     { userId: "user5", postId: posts[2].id },
     { userId: "user7", postId: posts[2].id },
@@ -572,7 +575,7 @@ async function main() {
 
   // Post 4 - very popular with creatives
   likeData.push(
-    { userId: "user1", postId: posts[4].id },
+    { userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM", postId: posts[4].id },
     { userId: "user7", postId: posts[4].id },
     { userId: "user9", postId: posts[4].id },
     { userId: "user5", postId: posts[4].id },
@@ -581,15 +584,15 @@ async function main() {
 
   // Post 6 - tech crowd loves it
   likeData.push(
-    { userId: "user1", postId: posts[6].id },
+    { userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM", postId: posts[6].id },
     { userId: "user3", postId: posts[6].id },
     { userId: "user7", postId: posts[6].id },
-    { userId: "user10", postId: posts[6].id },
+    { userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM0", postId: posts[6].id },
   );
 
   // Post 8 - everyone celebrates
   likeData.push(
-    { userId: "user1", postId: posts[8].id },
+    { userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM", postId: posts[8].id },
     { userId: "user2", postId: posts[8].id },
     { userId: "user3", postId: posts[8].id },
     { userId: "user6", postId: posts[8].id },
@@ -599,14 +602,14 @@ async function main() {
 
   // Post 10 - AI enthusiasts
   likeData.push(
-    { userId: "user1", postId: posts[10].id },
+    { userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM", postId: posts[10].id },
     { userId: "user5", postId: posts[10].id },
-    { userId: "user10", postId: posts[10].id },
+    { userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM0", postId: posts[10].id },
   );
 
   // Post 12 - mobile devs
   likeData.push(
-    { userId: "user1", postId: posts[12].id },
+    { userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM", postId: posts[12].id },
     { userId: "user4", postId: posts[12].id },
     { userId: "user9", postId: posts[12].id },
   );
@@ -615,7 +618,7 @@ async function main() {
   likeData.push(
     { userId: "user2", postId: posts[14].id },
     { userId: "user5", postId: posts[14].id },
-    { userId: "user10", postId: posts[14].id },
+    { userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM0", postId: posts[14].id },
   );
 
   // Post 16 - creatives
@@ -623,12 +626,12 @@ async function main() {
     { userId: "user3", postId: posts[16].id },
     { userId: "user7", postId: posts[16].id },
     { userId: "user9", postId: posts[16].id },
-    { userId: "user1", postId: posts[16].id },
+    { userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM", postId: posts[16].id },
   );
 
   // Post 18 - backend crowd
   likeData.push(
-    { userId: "user1", postId: posts[18].id },
+    { userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM", postId: posts[18].id },
     { userId: "user2", postId: posts[18].id },
     { userId: "user4", postId: posts[18].id },
     { userId: "user6", postId: posts[18].id },
@@ -655,15 +658,15 @@ async function main() {
   // 8. CREATE SAVED POSTS
   await prisma.savedPosts.createMany({
     data: [
-      { userId: "user1", postId: posts[6].id },
-      { userId: "user1", postId: posts[10].id },
+      { userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM", postId: posts[6].id },
+      { userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM", postId: posts[10].id },
       { userId: "user3", postId: posts[0].id },
       { userId: "user4", postId: posts[4].id },
       { userId: "user5", postId: posts[18].id },
       { userId: "user6", postId: posts[10].id },
       { userId: "user7", postId: posts[16].id },
       { userId: "user9", postId: posts[4].id },
-      { userId: "user10", postId: posts[0].id },
+      { userId: "user_38z8HS3wNPnEWrUFpRuDAgfR8IM0", postId: posts[0].id },
     ],
   });
 

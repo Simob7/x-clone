@@ -2,8 +2,6 @@
 import React from "react";
 import CustumImage from "./Image";
 import PostInfo from "./PostInfo";
-
-// Update the import path to match your actual Prisma client output location
 import { Post as PostType } from "../generated/prisma/client";
 import { format } from "timeago.js";
 import PostInteractions from "./PostIntercations";
@@ -16,8 +14,8 @@ export type PostWithDetails = PostType & {
     displayName: string | null;
     username: string;
     userImg: string | null;
+    id: number;
   };
-  // The nested repost has a similar structure
   rePost?:
     | (PostType & {
         user: {
@@ -35,128 +33,119 @@ export type PostWithDetails = PostType & {
   rePostCounts: number;
 };
 
-function Post({ post }: { post: PostWithDetails }) {
-  // Determine if we should show the original content
-  // If it's a repost, 'mainPost' becomes the original source
+const Post = ({
+  post,
+  currentUserId,
+}: {
+  post: PostWithDetails;
+  currentUserId?: string | null;
+}) => {
   const mainPost = post.rePost ? post.rePost : post;
   const router = useRouter();
 
   const handleCardClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
-
-    // 1. Ignore links and buttons
-    if (target.closest("button") || target.closest("a")) return;
-
-    // 2. Ignore video controls and the video player itself
-    // We check for 'video' tags or any container you use for the player
-    if (target.closest("video") || target.closest(".video-container")) return;
-
-    router.push(`${mainPost.user.username}/status/${post.id}`);
+    // Prevent navigation if clicking interactive elements
+    if (
+      target.closest("button") ||
+      target.closest("a") ||
+      target.closest("video") ||
+      target.closest(".video-container")
+    ) {
+      return;
+    }
+    // Route based on the post's actual owner (the one who posted/reposted)
+    router.push(`/${post.user.username}/status/${post.id}`);
   };
+
   return (
     <div
       onClick={handleCardClick}
-      className="p-1 border-y-[1px] border-borderGray w-full">
-      {/* 1. REPOST HEADER: Link to the person who clicked "Repost" */}
-      {post.rePostId && (
-        <Link
-          href={`/${post.user.username}`}
-          className="flex items-center gap-2 text-sm text-textGray  ml-8 hover:underline">
-          <div
-            className="w-4 h-4 bg-textGray"
-            style={{
-              maskImage: `url(/svg/repost.svg)`,
-              maskRepeat: "no-repeat",
-              maskSize: "contain",
-              WebkitMaskImage: `url(/svg/repost.svg)`,
-            }}
-          />
-          <span className="text-[12px] font-bold">
-            {post.user.displayName} reposted
-          </span>
-        </Link>
+      className="p-4 border-b border-borderGray w-full cursor-pointer hover:bg-white/[0.01]">
+      {/* Repost Header */}
+      {post.rePost && (
+        <div className="flex items-center gap-2 text-sm text-textGray mb-2 ml-8 font-bold">
+          <span>{post.user.displayName} reposted</span>
+        </div>
       )}
 
-      {/* 2. MAIN POST LAYOUT */}
-      <div className="flex gap-2">
-        {/* AVATAR: Links to the Original Author (mainPost) */}
+      <div className="flex gap-3">
+        {/* Avatar of Original Content Author */}
         <Link
           href={`/${mainPost.user.username}`}
           className="relative w-10 h-10 rounded-full overflow-hidden shrink-0">
           <CustumImage
-            src={mainPost.user.userImg || "general/noAvatar.png"}
+            src={mainPost.user.userImg || "/general/noAvatar.png"}
             width={100}
             height={100}
-            alt={`${mainPost.user.username}'s avatar`}
+            alt="avatar"
             tr={true}
-            className="cursor-pointer object-cover"
+            className="object-cover"
           />
         </Link>
 
-        {/* CONTENT AREA */}
-        <div className="flex-1 min-w-0 mb-1">
-          {/* USER INFO & TIME: Links to the Original Author (mainPost) */}
-          <div className="flex justify-between items-center gap-2">
-            <Link
-              href={`/${mainPost.user.username}`}
-              className="flex items-center gap-1 flex-wrap">
-              <h1 className="text-md font-bold cursor-pointer hover:underline">
+        <div className="flex-1 min-w-0">
+          <div className="flex justify-between items-center">
+            {/* User Info of Original Content Author */}
+            <div className="flex items-center gap-1 text-sm">
+              <Link
+                href={`/${mainPost.user.username}`}
+                className="font-bold hover:underline text-white">
                 {mainPost.user.displayName}
-              </h1>
-              <span className="text-textGray cursor-pointer text-sm">
-                @{mainPost.user.username}
+              </Link>
+              <span className="text-textGray">
+                @{mainPost.user.username} · {format(mainPost.createdAt)}
               </span>
-              <span className="text-textGray text-sm">
-                · {format(mainPost.createdAt)}
-              </span>
-            </Link>
-            <PostInfo />
+            </div>
+
+            {/* PostInfo handles Edit/Delete for the post entry (repost or original) */}
+            <PostInfo
+              ownerId={post.user.username}
+              currentUserId={currentUserId}
+              postId={post.id}
+            />
           </div>
 
-          {/* TEXT AND MEDIA: Displays original content (mainPost) */}
-          <div className="flex w-full flex-col mt-1">
-            <p className="pb-1 text-sm md:text-base leading-normal">
-              {mainPost.desc}
-            </p>
+          <p className="mt-1 text-white leading-normal">{mainPost.desc}</p>
 
+          {/* Media Section */}
+          {(mainPost.img || mainPost.video) && (
             <div
-              className="w-full video-container"
-              // {/* // Stop click from reaching the main div */}
+              className="mt-3 w-full video-container"
               onClick={(e) => e.stopPropagation()}>
               {mainPost.img ? (
                 <CustumImage
                   src={mainPost.img}
                   width={600}
                   height={600}
-                  alt="post image"
-                  tr={true}
-                  className="w-full h-auto rounded-xl border border-borderGray"
+                  alt="post"
+                  className="rounded-xl border border-borderGray w-full h-auto"
                 />
-              ) : mainPost.video ? (
-                <CustomVideo
-                  videoSrc={mainPost.video}
-                  // className="w-full aspect-video rounded-xl"
-                />
-              ) : null}
+              ) : (
+                <CustomVideo videoSrc={mainPost.video!} />
+              )}
             </div>
+          )}
+
+          {/* Interactions */}
+          <div className="mt-2 -ml-2">
+            <PostInteractions
+              postId={post.id}
+              username={post.user.username}
+              isLiked={post.hasLiked}
+              isSaved={post.hasSaved}
+              isReposted={post.hasReposted}
+              count={{
+                likes: post.likeCounts,
+                comments: post.commentCounts,
+                rePosts: post.rePostCounts,
+              }}
+            />
           </div>
         </div>
       </div>
-
-      {/* 3. INTERACTIONS */}
-      <PostInteractions
-        // postId={post.id} // Usually you want interactions to count toward the repost record ID
-        isLiked={post.hasLiked}
-        isSaved={post.hasSaved}
-        isReposted={post.hasReposted}
-        count={{
-          likes: post.likeCounts,
-          comments: post.commentCounts,
-          rePosts: post.rePostCounts,
-        }}
-      />
     </div>
   );
-}
+};
 
 export default Post;

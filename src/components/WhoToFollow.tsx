@@ -5,7 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 
 const WhoToFollow = async () => {
   // --- CONFIGURATION ---
-  const MAX_RECOMMENDATIONS = 9; // Change this number to show more/less
+  const MAX_RECOMMENDATIONS = 10; // Change this number to show more/less
 
   try {
     const { userId } = await auth();
