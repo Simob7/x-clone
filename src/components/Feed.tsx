@@ -71,6 +71,7 @@ async function Feed({ userProfileId }: { userProfileId: string }) {
       username: post.author.username,
       userImg: post.author.UserImg,
     },
+    rePostId: post.rePostId,
     rePost: post.rePost
       ? {
           ...post.rePost,
