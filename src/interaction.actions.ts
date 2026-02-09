@@ -2,6 +2,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "./prisma";
 import { revalidatePath } from "next/cache";
+import * as z from "zod";
 
 export const toggleLike = async (postId: number) => {
   const { userId } = await auth();
@@ -102,23 +103,48 @@ export const savePost = async (postId: number) => {
   }
 };
 //  add comments
+
 export const addComment = async (postId: number, formData: FormData) => {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const desc = formData.get("desc") as string;
-  if (!desc) return;
+  // 1. Define Schema
+  const CommentSchema = z.object({
+    desc: z
+      .string()
+      .min(1, "Comment is required")
+      .max(280, "Comment is too long"),
+  });
+
+  // 2. Validate data
+  const validatedFields = CommentSchema.safeParse({
+    desc: formData.get("desc"),
+  });
+
+  // 3. Handle validation failure
+  if (!validatedFields.success) {
+    console.error(
+      "Validation failed:",
+      validatedFields.error.flatten().fieldErrors,
+    );
+    return { error: "Invalid input data" };
+  }
+
+  const { desc } = validatedFields.data;
 
   try {
     await prisma.post.create({
       data: {
         desc,
         userId,
-        parentPostId: postId, // This links the new post as a comment
+        parentPostId: postId,
       },
     });
+
     revalidatePath(`/[username]/status/${postId}`, "page");
+    return { success: true };
   } catch (err) {
-    console.error(err);
+    console.error("Database Error:", err);
+    return { error: "Something went wrong while saving the comment" };
   }
 };

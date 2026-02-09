@@ -143,7 +143,7 @@ async function page({ params }: Props) {
             </div>
             <div className="flex items-center gap-1 cursor-pointer hover:underline">
               <span className="font-bold">{user._count.followers}</span>
-              <span className="text-textGray">Followers</span>
+              {/* <span className="text-textGray">Followers</span> */}
             </div>
           </div>
         </div>
