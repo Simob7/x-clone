@@ -1,5 +1,6 @@
 "use client";
 import CustumImage from "@/components/Image";
+import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
@@ -21,7 +22,7 @@ function PostModal() {
   const closeModal = () => {
     router.back();
   };
-
+  const { user } = useUser();
   return (
     // 1. Changed to fixed and inset-0 for full coverage
     // 2. Added backdrop-blur for a premium feel
@@ -46,7 +47,7 @@ function PostModal() {
         <div className="py-4 flex items-start gap-4">
           <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
             <CustumImage
-              src="general/avatar.png"
+              src={user?.imageUrl || "general/avatar.png"}
               width={40}
               height={40}
               alt="profil avatar"

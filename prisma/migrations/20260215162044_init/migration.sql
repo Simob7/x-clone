@@ -10,6 +10,8 @@ CREATE TABLE `User` (
     `website` VARCHAR(191) NULL,
     `UserImg` VARCHAR(191) NULL,
     `userCover` VARCHAR(191) NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `User_email_key`(`email`),
     UNIQUE INDEX `User_username_key`(`username`),
@@ -23,12 +25,16 @@ CREATE TABLE `Post` (
     `updatedAt` DATETIME(3) NOT NULL,
     `desc` VARCHAR(280) NULL,
     `img` VARCHAR(191) NULL,
+    `imgHeight` INTEGER NULL,
     `video` VARCHAR(191) NULL,
     `isSensitive` BOOLEAN NOT NULL DEFAULT false,
     `userId` VARCHAR(191) NOT NULL,
     `rePostId` INTEGER NULL,
     `parentPostId` INTEGER NULL,
 
+    INDEX `Post_userId_idx`(`userId`),
+    INDEX `Post_rePostId_idx`(`rePostId`),
+    INDEX `Post_parentPostId_idx`(`parentPostId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -39,18 +45,20 @@ CREATE TABLE `Like` (
     `userId` VARCHAR(191) NOT NULL,
     `postId` INTEGER NOT NULL,
 
+    INDEX `Like_postId_idx`(`postId`),
     UNIQUE INDEX `Like_userId_postId_key`(`userId`, `postId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `SavedPost` (
+CREATE TABLE `SavedPosts` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `userId` VARCHAR(191) NOT NULL,
     `postId` INTEGER NOT NULL,
 
-    UNIQUE INDEX `SavedPost_userId_postId_key`(`userId`, `postId`),
+    INDEX `SavedPosts_postId_idx`(`postId`),
+    UNIQUE INDEX `SavedPosts_userId_postId_key`(`userId`, `postId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -61,6 +69,7 @@ CREATE TABLE `Follow` (
     `followerId` VARCHAR(191) NOT NULL,
     `followingId` VARCHAR(191) NOT NULL,
 
+    INDEX `Follow_followingId_idx`(`followingId`),
     UNIQUE INDEX `Follow_followerId_followingId_key`(`followerId`, `followingId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -81,10 +90,10 @@ ALTER TABLE `Like` ADD CONSTRAINT `Like_userId_fkey` FOREIGN KEY (`userId`) REFE
 ALTER TABLE `Like` ADD CONSTRAINT `Like_postId_fkey` FOREIGN KEY (`postId`) REFERENCES `Post`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `SavedPost` ADD CONSTRAINT `SavedPost_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `SavedPosts` ADD CONSTRAINT `SavedPosts_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `SavedPost` ADD CONSTRAINT `SavedPost_postId_fkey` FOREIGN KEY (`postId`) REFERENCES `Post`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `SavedPosts` ADD CONSTRAINT `SavedPosts_postId_fkey` FOREIGN KEY (`postId`) REFERENCES `Post`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Follow` ADD CONSTRAINT `Follow_followerId_fkey` FOREIGN KEY (`followerId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
