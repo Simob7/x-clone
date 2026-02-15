@@ -266,3 +266,37 @@ export const addPost = async (prevState: any, formData: FormData) => {
     return { success: false, error: true, message: "Database creation failed" };
   }
 };
+
+export const followUser = async (targetUserId: string) => {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  try {
+    const existingFollow = await prisma.follow.findFirst({
+      where: {
+        followerId: userId,
+        followingId: targetUserId,
+      },
+    });
+
+    if (existingFollow) {
+      await prisma.follow.delete({
+        where: { id: existingFollow.id },
+      });
+    } else {
+      await prisma.follow.create({
+        data: {
+          followerId: userId,
+          followingId: targetUserId,
+        },
+      });
+    }
+
+    // THIS IS KEY: Tells Next.js to fetch new data for the page
+    revalidatePath(`/${targetUserId}`);
+    // Or just revalidatePath("/") if you're on the main feed
+  } catch (err) {
+    console.error(err);
+    throw new Error("Failed to update follow status");
+  }
+};

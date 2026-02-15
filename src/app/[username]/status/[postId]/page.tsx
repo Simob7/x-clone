@@ -75,9 +75,11 @@ async function PostPage({
       </header>
 
       {isRepost && (
-        <div className="px-4 py-2 text-textGray text-sm font-bold border-b border-borderGray flex items-center gap-2">
+        <Link
+          href={`/${p.author.username}`}
+          className="px-4 py-2 text-textGray text-sm font-bold border-b border-borderGray flex items-center gap-2">
           <span>{p.author.displayName} reposted</span>
-        </div>
+        </Link>
       )}
 
       <article className="px-4 py-3 flex flex-col gap-4">
