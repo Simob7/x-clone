@@ -31,7 +31,7 @@ export async function sharePost(data: FormData) {
             },
           }
         : {}),
-     });
+    });
 
     console.log("Upload Success:", response);
     // Serialize and Deserialize to ensure it's a plain object

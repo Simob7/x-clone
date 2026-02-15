@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "./Image";
 import { prisma } from "@/prisma";
 import { auth } from "@clerk/nextjs/server";
+import FollowButton from "./FollowButton";
 
 const WhoToFollow = async () => {
   // --- CONFIGURATION ---
@@ -94,9 +95,11 @@ const WhoToFollow = async () => {
             </div>
 
             {/* Action Button */}
-            <button className="py-1 px-4 font-semibold bg-white text-black rounded-full hover:bg-gray-200 transition-colors flex-shrink-0">
-              Follow
-            </button>
+            <FollowButton
+              userId={person.id} // Use person.id from the loop
+              isFollowed={false} // Since we filtered for 'notIn: followedIds', this is always false
+              isSelf={false} // Since we filtered for 'not: userId', this is always false
+            />
           </div>
         ))}
 

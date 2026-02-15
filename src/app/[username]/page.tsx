@@ -91,6 +91,7 @@ async function page({ params }: Props) {
             // userId={user.id}
             isFollowed={isFollowing}
             isSelf={isSelf}
+            userId={user.id}
           />
         </div>
 
@@ -138,12 +139,12 @@ async function page({ params }: Props) {
           {/* FOLLOW COUNTS: Using real DB numbers */}
           <div className="flex gap-4 text-sm mt-2">
             <div className="flex items-center gap-1 cursor-pointer hover:underline">
-              <span className="font-bold">{user._count.following}</span>
+              <span className="font-bold">{user?._count?.following}</span>
               <span className="text-textGray">Following</span>
             </div>
             <div className="flex items-center gap-1 cursor-pointer hover:underline">
-              <span className="font-bold">{user._count.followers}</span>
-              {/* <span className="text-textGray">Followers</span> */}
+              <span className="font-bold">{user?._count?.followers}</span>
+              <span className="text-textGray">Followers</span>
             </div>
           </div>
         </div>
