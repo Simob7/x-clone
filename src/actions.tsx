@@ -31,12 +31,7 @@ export async function sharePost(data: FormData) {
             },
           }
         : {}),
-      // IMPORTANT: Remove extensions if you haven't enabled them in ImageKit Dashboard
-      /* extensions: [
-        { name: "google-auto-tagging", minConfidence: 80, maxTags: 10 }
-      ] 
-      */
-    });
+     });
 
     console.log("Upload Success:", response);
     // Serialize and Deserialize to ensure it's a plain object

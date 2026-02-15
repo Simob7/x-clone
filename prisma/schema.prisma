@@ -62,6 +62,7 @@ model Post {
   updatedAt    DateTime @updatedAt
   desc         String?  @db.VarChar(280) // X uses 280 characters!
   img          String?  
+  imgHeight    Int?
   video        String?  // Made optional so text-only posts work
   isSensitive  Boolean  @default(false) // For that "Adult Content" warning
 

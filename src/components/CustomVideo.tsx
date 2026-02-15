@@ -1,5 +1,6 @@
 "use client";
 import React, { useRef, useState } from "react";
+const urlEndpoint = process.env.NEXT_PUBLIC_URL_ENDPOINT;
 
 export default function CustomVideo({
   videoSrc,
@@ -86,7 +87,7 @@ export default function CustomVideo({
                  fullscreen:rounded-none fullscreen:w-screen fullscreen:h-screen">
       <video
         ref={videoRef}
-        src={videoSrc}
+        src={`${urlEndpoint}/${videoSrc}`}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         onClick={handlePlayPause}
